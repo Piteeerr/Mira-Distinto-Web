@@ -1,48 +1,44 @@
 <!DOCTYPE html>
 <html lang="es-AR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contacto | Mira distinto</title>
-<meta name="description" content="Escribinos por WhatsApp, pedí un turno o visitá el local. Dirección y horarios.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="css/estilos.css">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f7f4ee">
+  <title>Contacto | Mirá Distinto</title>
+  <meta name="description" content="Contactate con Mirá Distinto por WhatsApp o Instagram.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-<header><div class="wrap">
-  <!-- LOGO: poné tu archivo en img/logo.png. Si no existe, se muestra el nombre en texto. -->
-  <a class="brand" href="index.html"><img src="img/logo.png" alt="Mira distinto" onerror="this.replaceWith(document.createTextNode('Mira distinto'))"></a>
-  <nav aria-label="Principal"><a href="index.html">Inicio</a><a href="catalogo.html">Catálogo</a><a href="servicios.html">Servicios</a><a href="nosotros.html">Nosotros</a><a href="contacto.html" aria-current="page">Contacto</a></nav>
+<header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="index.html" aria-label="Mirá Distinto, inicio"><img src="img/logo.png" alt="Mirá Distinto" onerror="this.replaceWith(document.createTextNode('Mirá Distinto'))"></a>
+  <nav class="main-nav" aria-label="Navegación principal"><a href="index.html">Inicio</a><a href="catalogo.html">Catálogo</a><a href="servicios.html">Qué ofrecemos</a><a href="nosotros.html">Nosotros</a><a href="contacto.html" aria-current="page">Contacto</a></nav>
 </div></header>
 
-<main class="wrap">
-<div class="two">
-  <div>
-    <h2>Contacto</h2>
-    <p class="lead">Escribinos, pedí un turno o pasá por el local.</p>
-    <form id="form">
-      <div><label for="n">Nombre</label><input id="n" required autocomplete="name"></div>
-      <div><label for="m">Motivo</label><select id="m"><option>Consulta general</option><option>Pedir turno de control</option><option>Presupuesto con receta</option><option>Lentes de contacto</option></select></div>
-      <div><label for="t">Mensaje</label><textarea id="t" rows="3"></textarea></div>
-      <button class="btn" type="submit"><span class="ico" data-icon="wsp"></span>Enviar por WhatsApp</button>
-    </form>
-  </div>
-  <div>
-    <h3 style="font-size:1.7rem;margin-bottom:8px">Dónde estamos</h3>
-    <p style="margin:0 0 16px">Dirección del local, barrio y ciudad<br>Lunes a viernes de 9 a 19 h · Sábados de 9 a 13 h</p>
-    <div class="slot">Acá va el mapa de Google Maps</div>
-    <div class="social"><a href="https://www.instagram.com/miradistinto2026/" rel="noopener" target="_blank"><span class="ico" data-icon="ig"></span>@miradistinto2026</a></div>
-  </div>
-</div>
+<main class="wrap page-main">
+  <section class="contact-layout">
+    <div>
+      <p class="eyebrow">ESTAMOS EN CONTACTO</p>
+      <h1>Hablemos.</h1>
+      <p class="section-intro">¿Viste un modelo que te gustó? ¿Querés saber más sobre nuestros productos? Escribinos y te respondemos.</p>
+      <a class="btn contact-main-btn" data-wa="Hola, quisiera hacer una consulta a Mirá Distinto."><span class="ico" data-icon="wsp"></span>Escribir por WhatsApp</a>
+      <p class="contact-phone">+54 9 11 5461-1610</p>
+    </div>
+    <aside class="contact-card">
+      <p class="eyebrow">TAMBIÉN PODÉS ENCONTRARNOS EN</p>
+      <a class="social-link" href="https://www.instagram.com/miradistinto2026/" target="_blank" rel="noopener"><span class="ico" data-icon="ig"></span><span><strong>Instagram</strong><small>@miradistinto2026</small></span><span aria-hidden="true">↗</span></a>
+      <div class="contact-divider"></div>
+      <h2>¿Querés visitarnos?</h2>
+      <p>Escribinos para consultar la ubicación y los horarios de atención actualizados.</p>
+      <a class="text-link" data-wa="Hola, quisiera consultar la dirección y los horarios de atención de Mirá Distinto.">Consultar ubicación y horarios ↗</a>
+    </aside>
+  </section>
 </main>
 
-<footer><div class="wrap">© 2026 Mira distinto. Los precios y la disponibilidad pueden cambiar.</div></footer>
-<a class="btn wa" data-wa="Hola! Quisiera hacer una consulta" aria-label="Escribinos por WhatsApp"><span class="ico" data-icon="wsp"></span></a>
-
-<script src="js/config.js"></script>
-<script src="js/productos.js"></script>
-<script src="js/app.js"></script>
+<footer class="site-footer"><div class="wrap footer-inner">
+  <a class="footer-brand" href="index.html">Mirá Distinto<span>Óptica</span></a><p>Una forma distinta de mirar.</p>
+  <div class="footer-links"><a href="catalogo.html">Catálogo</a><a href="servicios.html">Qué ofrecemos</a><a href="contacto.html">Contacto</a></div>
+  <small>© 2026 Mirá Distinto. Todos los derechos reservados.</small>
+</div></footer>
+<a class="wa-float" data-wa="Hola, quisiera hacer una consulta a Mirá Distinto." aria-label="Contactar por WhatsApp"><span class="ico" data-icon="wsp"></span></a>
+<script src="js/config.js"></script><script src="js/productos.js"></script><script src="js/app.js"></script>
 </body>
 </html>

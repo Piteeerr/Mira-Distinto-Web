@@ -1,16 +1,66 @@
-// ===== Catálogo =====
-// Para agregar un producto, copiá una línea y cambiá los datos.
-//  nombre, marca, categoria  -> texto (la categoría crea el filtro sola)
-//  precio                    -> "$85.000" o "" para mostrar "Consultar precio"
-//  foto                      -> opcional, ej: "img/productos/luna.jpg" (sin foto se dibuja un modelo simple)
-//  forma / color / sol       -> solo para el dibujo sin foto (redondo, cuadrado, aviador, cat, lc)
-//  destacado: true           -> lo muestra en la página de Inicio
+// ===== Catálogo de Mirá Distinto =====
+// Cada producto utiliza una fotografía ya guardada en img/productos/.
+// No se cargan precios ni marcas hasta contar con información confirmada.
+// nombre, categoria, foto y descripcion son los datos visibles en el catálogo.
+// destacado: true -> aparece también en la portada.
+
 var PRODUCTS = [
-  {nombre:"Modelo Luna",marca:"Marca A",categoria:"Armazones de receta",precio:"$85.000",color:"#5a1f3a",forma:"redondo",destacado:true},
-  {nombre:"Modelo Norte",marca:"Marca B",categoria:"Armazones de receta",precio:"$92.000",color:"#1c1a1f",forma:"cuadrado"},
-  {nombre:"Modelo Brisa",marca:"Marca C",categoria:"Armazones de receta",precio:"",color:"#a98348",forma:"cat",destacado:true},
-  {nombre:"Modelo Costa",marca:"Marca A",categoria:"Anteojos de sol",precio:"$78.000",color:"#8a5a2b",forma:"aviador",sol:true,destacado:true},
-  {nombre:"Modelo Sol",marca:"Marca D",categoria:"Anteojos de sol",precio:"$69.000",color:"#222",forma:"cuadrado",sol:true},
-  {nombre:"Lentes de contacto mensuales",marca:"Marca E",categoria:"Lentes de contacto",precio:"",color:"#5a1f3a",forma:"lc"},
-  {nombre:"Líquido multipropósito",marca:"Marca F",categoria:"Accesorios",precio:"$12.000",color:"#a98348",forma:"lc"}
+  {
+    nombre: "Anteojo de sol negro",
+    categoria: "Anteojos de sol",
+    descripcion: "Montura negra con detalles carey y lentes degradé.",
+    foto: "img/productos/01_lentes_sol_negros.jpg",
+    destacado: true
+  },
+  {
+    nombre: "Armazón rosa translúcido",
+    categoria: "Armazones",
+    descripcion: "Diseño de líneas suaves en tono rosa translúcido.",
+    foto: "img/productos/02_anteojos_rosa.jpg",
+    destacado: true
+  },
+  {
+    nombre: "Armazón carey",
+    categoria: "Armazones",
+    descripcion: "Combinación clásica de tonos carey.",
+    foto: "img/productos/03_anteojos_marmol_tortuga.jpg"
+  },
+  {
+    nombre: "Armazón azul turquesa",
+    categoria: "Armazones",
+    descripcion: "Montura de color turquesa con detalles en tono miel.",
+    foto: "img/productos/04_anteojos_azul_turquesa.jpg",
+    destacado: true
+  },
+  {
+    nombre: "Armazón azul marmolado",
+    categoria: "Armazones",
+    descripcion: "Diseño translúcido con efecto marmolado en azul.",
+    foto: "img/productos/05_anteojos_azul_marmolado.jpg"
+  },
+  {
+    nombre: "Armazón transparente",
+    categoria: "Armazones",
+    descripcion: "Montura translúcida en tono claro.",
+    foto: "img/productos/06_anteojos_transparentes.jpg"
+  },
+  {
+    nombre: "Armazón verde",
+    categoria: "Armazones",
+    descripcion: "Un modelo de color verde para quienes buscan algo diferente.",
+    foto: "img/productos/07_anteojos_verdes.jpeg"
+  },
+  {
+    nombre: "Anteojo de sol color miel",
+    categoria: "Anteojos de sol",
+    descripcion: "Montura translúcida color miel con lentes marrones degradé.",
+    foto: "img/productos/08_anteojos_color_miel.png",
+    destacado: true
+  },
+  {
+    nombre: "Estuche portátil",
+    categoria: "Accesorios",
+    descripcion: "Una opción práctica para guardar tus anteojos.",
+    foto: "img/productos/09_estuche_portatil.jpeg"
+  }
 ];
