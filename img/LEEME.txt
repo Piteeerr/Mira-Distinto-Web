@@ -1,0 +1,6 @@
+Poné acá tus imágenes:
+  logo.png          -> logo de la óptica (se ve arriba a la izquierda)
+  logo-wsp.png      -> logo de WhatsApp
+  logo-ig.png       -> logo de Instagram
+  productos/        -> fotos de los modelos (después se enlazan en js/productos.js con foto:"img/productos/luna.jpg")
+Tip: usá imágenes livianas (menos de 200 KB cada una, formato .webp o .jpg).

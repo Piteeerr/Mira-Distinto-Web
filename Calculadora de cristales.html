@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de cristales</title>
+<style>
+:root{
+  --bg:#f4f7f9; --card:#ffffff; --ink:#10263a; --muted:#5b6b7a; --line:#d9e2e9;
+  --accent:#0b5c8f; --accent-ink:#ffffff; --accent-soft:#e3f0f8;
+  --ok:#17693a; --ok-soft:#e1f3e8; --warn:#8a5a00; --warn-soft:#fff2d6; --bad:#a3262a;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1821; --card:#15232f; --ink:#e8eff4; --muted:#9db0bf; --line:#27394a;
+    --accent:#5fb4e8; --accent-ink:#06202f; --accent-soft:#17384d;
+    --ok:#7fd6a0; --ok-soft:#173a28; --warn:#f0c46a; --warn-soft:#3a2d0f; --bad:#ff8a8d;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#0d1821; --card:#15232f; --ink:#e8eff4; --muted:#9db0bf; --line:#27394a;
+    --accent:#5fb4e8; --accent-ink:#06202f; --accent-soft:#17384d;
+    --ok:#7fd6a0; --ok-soft:#173a28; --warn:#f0c46a; --warn-soft:#3a2d0f; --bad:#ff8a8d;
+    color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.45}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.6rem;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 20px;max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:20px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card + .card{margin-top:14px}
+h2{font-size:1rem;margin:0 0 10px}
+label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:3px}
+input[type=text],input[type=number],select{width:100%;font:inherit;padding:10px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input:focus,select:focus,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.rx{display:grid;grid-template-columns:44px 1fr 1fr;gap:8px 10px;align-items:end}
+.rx .eye{font-weight:700;padding-bottom:11px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{margin:0;padding:9px 12px;border:1px solid var(--line);border-radius:999px;color:var(--ink);cursor:pointer;font-size:.92rem;background:var(--bg)}
+.seg input:checked + label{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg input:focus-visible + label{outline:3px solid var(--accent);outline-offset:1px}
+.field{margin-top:14px}
+.note{font-size:.82rem;color:var(--muted);margin-top:6px}
+details{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.chk{display:flex;gap:8px;align-items:center;margin:6px 0;color:var(--ink);font-size:.92rem}
+.chk input{width:18px;height:18px}
+.res-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.res-head h2{margin:0}
+.count{color:var(--muted);font-size:.9rem}
+.opt{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px;background:var(--card);display:grid;grid-template-columns:1fr auto;gap:8px 16px}
+.opt .name{font-weight:650}
+.opt .meta{font-size:.85rem;color:var(--muted);margin-top:2px}
+.price{text-align:right}
+.price .big{font-size:1.5rem;font-weight:750;letter-spacing:-.01em;color:var(--accent);white-space:nowrap}
+.price .small{font-size:.78rem;color:var(--muted)}
+.badge{display:inline-block;font-size:.74rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-right:4px;font-weight:600}
+.badge.promo{background:var(--ok-soft);color:var(--ok)}
+.warn{grid-column:1/-1;font-size:.84rem;background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:6px 10px}
+.actions{grid-column:1/-1;display:flex;gap:8px;align-items:center}
+button{font:inherit;cursor:pointer;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:8px;padding:7px 12px;font-weight:600}
+button:hover{background:var(--accent-soft)}
+.empty{padding:28px 10px;text-align:center;color:var(--muted)}
+.sec-title{margin:22px 0 4px;font-size:.95rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.internal{color:var(--muted);font-size:.78rem}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Calculadora de cristales</h1>
+  <p class="sub">Cargá la receta, elegí el tipo de cristal y el armazón. Te muestro qué cristales entran en esa graduación y cuánto sale el par, con IVA incluido.</p>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>Receta</h2>
+        <div class="rx">
+          <span></span><label for="odE">Esfera</label><label for="odC">Cilindro</label>
+          <span class="eye">OD</span><input id="odE" type="text" inputmode="decimal" placeholder="-1,00" autocomplete="off"><input id="odC" type="text" inputmode="decimal" placeholder="-2,50" autocomplete="off">
+          <span class="eye">OI</span><input id="oiE" type="text" inputmode="decimal" placeholder="-1,25" autocomplete="off"><input id="oiC" type="text" inputmode="decimal" placeholder="-3,25" autocomplete="off">
+        </div>
+        <div class="field" id="addWrap" hidden>
+          <label for="add">Adición</label>
+          <input id="add" type="text" inputmode="decimal" placeholder="+2,00" autocomplete="off" style="max-width:140px">
+        </div>
+        <div class="note" id="rxNote">Cilindro en negativo. Si cargás un cilindro positivo, lo paso a negativo solo.</div>
+      </div>
+
+      <div class="card">
+        <h2>Cristal y armazón</h2>
+        <div class="field" style="margin-top:0">
+          <label>Tipo de cristal</label>
+          <div class="seg" id="tipo">
+            <input type="radio" name="tipo" id="t1" value="mono" checked><label for="t1">Monofocal</label>
+            <input type="radio" name="tipo" id="t2" value="bif"><label for="t2">Bifocal</label>
+            <input type="radio" name="tipo" id="t3" value="mul"><label for="t3">Multifocal</label>
+            <input type="radio" name="tipo" id="t4" value="ocu"><label for="t4">Ocupacional</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Armazón</label>
+          <div class="seg" id="frame">
+            <input type="radio" name="frame" id="f1" value="0" checked><label for="f1">Común (aro entero)</label>
+            <input type="radio" name="frame" id="f2" value="1"><label for="f2">Ranurado</label>
+            <input type="radio" name="frame" id="f3" value="2"><label for="f3">Perforado</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Qué tiene que tener</label>
+          <div class="seg" id="feat">
+            <input type="checkbox" id="x_ar" value="ar"><label for="x_ar">Antirreflejo</label>
+            <input type="checkbox" id="x_blue" value="blue"><label for="x_blue">Blue cut</label>
+            <input type="checkbox" id="x_foto" value="foto"><label for="x_foto">Fotocromático</label>
+            <input type="checkbox" id="x_polar" value="polar"><label for="x_polar">Polarizado</label>
+            <input type="checkbox" id="x_sol" value="sol"><label for="x_sol">Solar</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="mat">Material</label>
+          <select id="mat">
+            <option value="">Todos</option>
+            <option value="org">Orgánico</option>
+            <option value="hi">Alto índice (más fino)</option>
+            <option value="poli">Policarbonato</option>
+            <option value="min">Mineral (vidrio)</option>
+          </select>
+        </div>
+        <details>
+          <summary>Agregados (se suman al total)</summary>
+          <div id="extras"></div>
+          <div class="note">No sumes un agregado que el cristal ya trae, por ejemplo antirreflejo en uno «con AR».</div>
+        </details>
+        <details>
+          <summary>Precios y márgenes</summary>
+          <div class="two">
+            <div><label for="mL">Margen cristales (x)</label><input id="mL" type="text" inputmode="decimal" value="2,5"></div>
+            <div><label for="mS">Margen calibrado y agregados (x)</label><input id="mS" type="text" inputmode="decimal" value="2,5"></div>
+            <div><label for="iva">IVA (%)</label><input id="iva" type="text" inputmode="decimal" value="21"></div>
+          </div>
+          <label class="chk"><input type="checkbox" id="showCost"> Mostrar costos del laboratorio (uso interno)</label>
+        </details>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="res-head"><h2>Opciones para esta receta</h2><span class="count" id="count"></span></div>
+        <div id="out"><div class="empty">Cargá la esfera y el cilindro de cada ojo para ver los cristales y precios.</div></div>
+      </div>
+      <p class="note">Precios por par de cristales, tomados de la lista N°48 de Taller Optico (03/08/2026). El precio al público es el costo por el margen, redondeado a $100, más IVA. La lista no define todos los rangos de graduación: donde aparece un aviso amarillo, confirmá con el laboratorio antes de prometer el cristal.</p>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const DATA = {"items": [{"id": "P001", "n": "Calibrado común + orgánico BLANCO", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 4212, "tags": [], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "Rango de stock +/-6,00 con cil -2,00", "fr": "comun"}, {"id": "P002", "n": "Calibrado ranurado + orgánico BLANCO", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 5563, "tags": [], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "ranurado"}, {"id": "P003", "n": "Calibrado perforado + orgánico BLANCO", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 8968, "tags": [], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "perforado"}, {"id": "P004", "n": "Calibrado común + orgánico HMC", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 6208, "tags": ["ar"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "comun"}, {"id": "P005", "n": "Calibrado ranurado + orgánico HMC", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 7284, "tags": ["ar"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "ranurado"}, {"id": "P006", "n": "Calibrado perforado + orgánico HMC", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 10784, "tags": ["ar"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "perforado"}, {"id": "P007", "n": "Calibrado común + orgánico BLUE", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 9708, "tags": ["blue", "arq"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "comun"}, {"id": "P008", "n": "Calibrado ranurado + orgánico BLUE", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 11056, "tags": ["blue", "arq"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "ranurado"}, {"id": "P009", "n": "Calibrado perforado + orgánico BLUE", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 14828, "tags": ["blue", "arq"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": null, "cm": "org", "o": "", "fr": "perforado"}, {"id": "P010", "n": "Orgánico Essencial (simil Phancolor 1)", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "min", "cost": 7704, "tags": ["foto"], "rg": {"t": "unk"}, "cal": null, "cm": "min", "o": "", "fr": "comun"}, {"id": "P011", "n": "Orgánico fotocromático con AR", "g": "Promoción con calibrado incluido", "c": "mono", "p": "promo", "m": "org", "cost": 20260, "tags": ["foto", "ar"], "rg": {"t": "std", "e": 4, "c": 2}, "cal": null, "cm": "org", "o": "Rango stock fotocromático con AR +/-4.00 con cil -2.00", "fr": "comun"}, {"id": "P012", "n": "Orgánico Blanco", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 2802, "tags": [], "rg": {"t": "std", "e": 6, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P013", "n": "Orgánico Blanco rango extendido", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 8200, "tags": [], "rg": {"t": "ext", "e": 6, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P014", "n": "Orgánico Antirreflejo", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 5300, "tags": ["ar"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": "mono_stock", "cm": "org", "o": "Rango stock hasta cil -2,00"}, {"id": "P015", "n": "Orgánico Antirreflejo rango extendido", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 10800, "tags": ["ar"], "rg": {"t": "ext", "e": 6, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P016", "n": "Orgánico Blue lite cut", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 9000, "tags": ["blue", "arq"], "rg": {"t": "std", "e": 6, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P017", "n": "Orgánico Blue Lite Cut rango extendido", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 12500, "tags": ["blue", "arq"], "rg": {"t": "ext", "e": 6, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P018", "n": "Orgánico Fotosensible", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 12500, "tags": ["foto"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P019", "n": "Orgánico Fotosensible Fashion Mirror Neutro", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 34693, "tags": ["foto"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P020", "n": "Orgánico Fotosensible COLOR MAJESTIC NEUTRO (Blue, Purple, Pink, Brown, Green)", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 28676, "tags": ["foto"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": "NUEVO"}, {"id": "P021", "n": "Orgánico Fotosensible con Antirreflejo", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 20000, "tags": ["foto", "ar"], "rg": {"t": "std", "e": 4, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P022", "n": "Orgánico Fotosensible con Antirreflejo rango extendido", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 27300, "tags": ["foto", "ar"], "rg": {"t": "ext", "e": 4, "c": 2}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P023", "n": "Orgánico Fotosensible Blue con Antirreflejo", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 24500, "tags": ["foto", "blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P024", "n": "Orgánico Fotosensible Blue EXTENDIDO con Antirreflejo", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 41195, "tags": ["foto", "blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P025", "n": "Orgánico Vuble Fotocromático Adaptec (FBD)", "g": "Stock", "c": "mono", "p": "stock", "m": "org", "cost": 58056, "tags": ["foto"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P026", "n": "Orgánico HD Bio 1.61 +AR+UVX+BLUE", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 18926, "tags": ["blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P027", "n": "Orgánico HD Bio 1.61 Rango extendido", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 31092, "tags": [], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P028", "n": "Acrílico Blue con AR", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "org", "cost": 14552, "tags": ["blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P029", "n": "Orgánico 1.67 Blue con AR", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 33800, "tags": ["blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P030", "n": "Orgánico 1.60 Foto Blue con AR", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 52300, "tags": ["foto", "blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P031", "n": "Orgánico 1.71 Blue con AR (asférico ambas caras)", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 48000, "tags": ["blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": "NUEVO"}, {"id": "P032", "n": "Orgánico Ultravex Blue", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 19085, "tags": ["blue", "arq"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P033", "n": "Orgánico Ultravex Blue rango extendido", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 30332, "tags": ["blue", "arq"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P034", "n": "Orgánico Antiage HD 1,60", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 28030, "tags": [], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P035", "n": "Orgánico Antiage HD 1,60 extendido", "g": "Alto índice de stock", "c": "mono", "p": "stock", "m": "hi", "cost": 34933, "tags": [], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P036", "n": "Policarbonato Blanco", "g": "Policarbonato de stock", "c": "mono", "p": "stock", "m": "poli", "cost": 9242, "tags": [], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "poli", "o": ""}, {"id": "P037", "n": "Policarbonato con Antirreflejo", "g": "Policarbonato de stock", "c": "mono", "p": "stock", "m": "poli", "cost": 12609, "tags": ["ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "poli", "o": ""}, {"id": "P038", "n": "Policarbonato con AR extendido", "g": "Policarbonato de stock", "c": "mono", "p": "stock", "m": "poli", "cost": 23571, "tags": ["ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "poli", "o": ""}, {"id": "P039", "n": "Policarbonato Fotocromático con AR", "g": "Policarbonato de stock", "c": "mono", "p": "stock", "m": "poli", "cost": 84023, "tags": ["foto", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "poli", "o": ""}, {"id": "P040", "n": "Policarbonato Blue lite cut", "g": "Policarbonato de stock", "c": "mono", "p": "stock", "m": "poli", "cost": 34317, "tags": ["blue", "arq"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "poli", "o": ""}, {"id": "P041", "n": "CR sol uniforme", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 7374, "tags": ["sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P042", "n": "CR sol Degradé", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 8541, "tags": ["sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P043", "n": "CR sol Base 8", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 10614, "tags": ["sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P044", "n": "Lente Polarizada Neutra Gris/Sepia Orgánico", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 30330, "tags": ["polar", "sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P045", "n": "Placa polarizada Compacta (Gris – Sepia – G15)", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 14028, "tags": ["polar", "sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P046", "n": "Placa polarizada Degradé (Gris – Sepia)", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 15248, "tags": ["polar", "sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P047", "n": "Polarizado Espejado (Rosa – Azul)", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 16578, "tags": ["polar", "sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P048", "n": "Polarizado Drive", "g": "Solar de stock", "c": "mono", "p": "stock", "m": "org", "cost": 32453, "tags": ["polar", "sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P049", "n": "Mineral Blanco Esf al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 7721, "tags": [], "rg": {"t": "min", "e": 2.0, "c": 0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P050", "n": "Mineral Blanco Esf al 400", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 8385, "tags": [], "rg": {"t": "min", "e": 4.0, "c": 0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P051", "n": "Mineral Blanco Esf al 600", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 13354, "tags": [], "rg": {"t": "min", "e": 6.0, "c": 0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P052", "n": "Mineral Blanco 200 al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 11946, "tags": [], "rg": {"t": "min", "e": 2.0, "c": 2.0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P053", "n": "Mineral Blanco 400 al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 16850, "tags": [], "rg": {"t": "min", "e": 4.0, "c": 2.0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P054", "n": "Mineral Blanco 600 al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 21027, "tags": [], "rg": {"t": "min", "e": 6.0, "c": 2.0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P055", "n": "Mineral Fotocromático Esf al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 36420, "tags": ["foto"], "rg": {"t": "min", "e": 2.0, "c": 0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P056", "n": "Mineral Fotocromático Esf al 400", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 40596, "tags": ["foto"], "rg": {"t": "min", "e": 4.0, "c": 0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P057", "n": "Mineral Fotocromático 200 al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 44821, "tags": ["foto"], "rg": {"t": "min", "e": 2.0, "c": 2.0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P058", "n": "Mineral Fotocromático 400 al 200", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 53934, "tags": ["foto"], "rg": {"t": "min", "e": 4.0, "c": 2.0}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P059", "n": "Mineral Neutro Sol", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 29935, "tags": ["sol"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P060", "n": "Phancolor 3", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 63128, "tags": ["foto"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P061", "n": "Phancolor 3 con AR interno", "g": "Mineral de stock", "c": "mono", "p": "stock", "m": "min", "cost": 79315, "tags": ["foto", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "min", "o": ""}, {"id": "P062", "n": "Orgánico Orma Blanco", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 16694, "tags": [], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P063", "n": "Orgánico Crizal Easy", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 50612, "tags": ["ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P064", "n": "Orgánico Crizal Rock Blue UV", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 75132, "tags": ["blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P065", "n": "Orgánico Crizal Sapphire HR Blue UV", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 83328, "tags": ["blue", "ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P066", "n": "Orgánico Crizal Prevencia", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 83328, "tags": ["ar"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P067", "n": "Transitions GEN 8 Gris", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 96602, "tags": ["foto"], "rg": {"t": "unk"}, "cal": "mono_stock", "cm": "org", "o": ""}, {"id": "P068", "n": "Kodak Blue", "g": "Essilor de stock", "c": "mono", "p": "stock", "m": "org", "cost": 30514, "tags": ["blue", "arq"], "rg": {"t": "kod"}, "cal": "mono_stock", "cm": "org", "o": "Rango Esf +4.00/-4.00 Cil -2.00"}, {"id": "P070", "n": "Orgánico Blanco", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 18126, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P071", "n": "Orgánico Fotocromático", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 52230, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P072", "n": "Orgánico Fotocromático Blue", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 70667, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P073", "n": "Orgánico Blue lite cut", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 39858, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P074", "n": "Orgánico Fotocromático Fashion Mirror", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 65725, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P075", "n": "Orgánico Fotocromático COLOR MAJESTIC (Blue, Purple, Pink, Brown, Green)", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 65388, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": "NUEVO"}, {"id": "P076", "n": "Orgánico Majestic Myopia 1.49", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 60107, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P077", "n": "Orgánico Majestic Myopia 1.60", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "hi", "cost": 85161, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P078", "n": "Orgánico 1.67", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "hi", "cost": 77893, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P079", "n": "Orgánico 1.67 Blue", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "hi", "cost": 85849, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P080", "n": "Orgánico 1.67 Fotocromático", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "hi", "cost": 107843, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P081", "n": "Orgánico 1.74", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "hi", "cost": 148500, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P082", "n": "Transitions GEN S", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 271646, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P083", "n": "Transitions GEN 8 Gris", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 236962, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P084", "n": "Polarizado hasta 8 dioptrías orgánico", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 56066, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P085", "n": "Polarizado DRIVE", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 99430, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P086", "n": "Polarizado Foto DRIVE", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 134820, "tags": ["polar", "foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P087", "n": "Orgánico X-Perio Polarizado", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "org", "cost": 178734, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P088", "n": "Stylis Blanco", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "hi", "cost": 99563, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P089", "n": "Policarbonato Blanco", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "poli", "cost": 30809, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P090", "n": "Policarbonato Blue", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "poli", "cost": 54408, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P091", "n": "Policarbonato Fotocromático", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "poli", "cost": 95465, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P092", "n": "Policarbonato polarizado Espejado", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "poli", "cost": 148891, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P093", "n": "Mineral Blanco", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "min", "cost": 44153, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "min", "o": "Los minerales demoran 5 días"}, {"id": "P094", "n": "Mineral High Lite 1.7", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "min", "cost": 60576, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "min", "o": "Los minerales demoran 5 días"}, {"id": "P095", "n": "Mineral Fotocromático", "g": "Laboratorio", "c": "mono", "p": "lab", "m": "min", "cost": 68072, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "min", "o": "Los minerales demoran 5 días"}, {"id": "P096", "n": "Kriptok y Flap Top Blanco Orgánico", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 20953, "tags": [], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P097", "n": "Kriptok y Flap Top Fotocromático Orgánico", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 60424, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P098", "n": "Flap Top Polarizado Orgánico", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 76988, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P099", "n": "Flap Top Blue lite cut Orgánico", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 45645, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P100", "n": "Flap Top Blanco Policarbonato", "g": "Bifocal", "c": "bif", "p": "lab", "m": "poli", "cost": 49151, "tags": [], "rg": {"t": "lab"}, "cal": "bif", "cm": "poli", "o": ""}, {"id": "P101", "n": "Flap Top Polarizado Policarbonato", "g": "Bifocal", "c": "bif", "p": "lab", "m": "poli", "cost": 142280, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "bif", "cm": "poli", "o": ""}, {"id": "P102", "n": "Flap Top Fotocromático Blue", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 90290, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P103", "n": "Flap Top Fotocromático Adaptec", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 155951, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P104", "n": "Flap Top Transitions Gen 8", "g": "Bifocal", "c": "bif", "p": "lab", "m": "org", "cost": 308680, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P105", "n": "Flap Top Fotocromático Policarbonato", "g": "Bifocal", "c": "bif", "p": "lab", "m": "poli", "cost": 147488, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "poli", "o": ""}, {"id": "P106", "n": "Kriptok Blanco Mineral", "g": "Bifocal", "c": "bif", "p": "lab", "m": "min", "cost": 69044, "tags": [], "rg": {"t": "lab"}, "cal": "bif", "cm": "min", "o": ""}, {"id": "P107", "n": "Kriptok Fotocromático Mineral", "g": "Bifocal", "c": "bif", "p": "lab", "m": "min", "cost": 137496, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "min", "o": ""}, {"id": "P108", "n": "Flap Top Blanco Mineral", "g": "Bifocal", "c": "bif", "p": "lab", "m": "min", "cost": 132627, "tags": [], "rg": {"t": "lab"}, "cal": "bif", "cm": "min", "o": ""}, {"id": "P109", "n": "Flap Top Fotocromático Mineral", "g": "Bifocal", "c": "bif", "p": "lab", "m": "min", "cost": 176510, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "min", "o": ""}, {"id": "P110", "n": "Orgánico Blanco Genérico", "g": "Multifocal LG (genérico, sin garantía)", "c": "mul", "p": "lab", "m": "org", "cost": 37034, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "Genéricos sin garantía"}, {"id": "P111", "n": "Orgánico Fotocromático Genérico", "g": "Multifocal LG (genérico, sin garantía)", "c": "mul", "p": "lab", "m": "org", "cost": 71761, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "Genéricos sin garantía"}, {"id": "P112", "n": "Orgánico Blue Cut Genérico", "g": "Multifocal LG (genérico, sin garantía)", "c": "mul", "p": "lab", "m": "org", "cost": 67061, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "Genéricos sin garantía"}, {"id": "P113", "n": "Policarbonato Blanco Genérico", "g": "Multifocal LG (genérico, sin garantía)", "c": "mul", "p": "lab", "m": "poli", "cost": 67047, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": "Genéricos sin garantía"}, {"id": "P114", "n": "Policarbonato Blue Cut Genérico", "g": "Multifocal LG (genérico, sin garantía)", "c": "mul", "p": "lab", "m": "poli", "cost": 116440, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": "Genéricos sin garantía"}, {"id": "P115", "n": "Orgánico Blanco", "g": "Ocupacional LG", "c": "ocu", "p": "lab", "m": "org", "cost": 36333, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P116", "n": "Orgánico Blue", "g": "Ocupacional LG", "c": "ocu", "p": "lab", "m": "org", "cost": 55148, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P117", "n": "Espace Plus Blanco", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 134107, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P118", "n": "Espace Plus Transitions", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 343602, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P119", "n": "Varilux Liberty Blue", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 277080, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P120", "n": "Varilux Comfort Blue", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 343602, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P121", "n": "Varilux Comfort Transitions GEN 8", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 517419, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P122", "n": "Varilux Physio Blue", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 434703, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P123", "n": "Varilux Physio Transitions GEN 8", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 607070, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P124", "n": "Interview Blanco", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 77479, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P125", "n": "Espace Plus Blanco", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 178883, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P126", "n": "Espace Plus Transitions GEN 8", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 385034, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P127", "n": "Varilux Comfort Blue", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 386337, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P128", "n": "Varilux Comfort Transitions GEN 8", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 559491, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P129", "n": "Varilux Physio Blue", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 478151, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P130", "n": "Varilux Physio Transitions GEN 8", "g": "Essilor", "c": "mul", "p": "lab", "m": "org", "cost": 655559, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "Consulte por toda la línea de progresivos de Essilor"}, {"id": "P131", "n": "Unique DRO orgánico BLANCO", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "org", "cost": 187410, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P132", "n": "Unique DRO orgánico BLUE", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "org", "cost": 199281, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P133", "n": "Unique DRO orgánico TRANSITIONS", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "org", "cost": 390581, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P134", "n": "Unique DRO AIRWEAR", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "org", "cost": 187410, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P135", "n": "Unique DRO AIRWEAR BLUE", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "org", "cost": 199309, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P136", "n": "Unique DRO STYLIS", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "hi", "cost": 253976, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P137", "n": "Unique DRO STYLIS BLUE", "g": "Kodak Unique DRO", "c": "mul", "p": "lab", "m": "hi", "cost": 264411, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P138", "n": "Precise orgánico BLANCO", "g": "Kodak Precise", "c": "mul", "p": "lab", "m": "org", "cost": 162041, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P139", "n": "Precise orgánico BLUE", "g": "Kodak Precise", "c": "mul", "p": "lab", "m": "org", "cost": 172709, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P140", "n": "Precise orgánico TRANSITIONS", "g": "Kodak Precise", "c": "mul", "p": "lab", "m": "org", "cost": 362557, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P141", "n": "Precise AIRWEAR", "g": "Kodak Precise", "c": "mul", "p": "lab", "m": "org", "cost": 162091, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P142", "n": "Precise STYLIS", "g": "Kodak Precise", "c": "mul", "p": "lab", "m": "hi", "cost": 226612, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P143", "n": "Precise STYLIS BLUE", "g": "Kodak Precise", "c": "mul", "p": "lab", "m": "hi", "cost": 239117, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P144", "n": "Orgánico Blanco", "g": "Ocupacional digital", "c": "ocu", "p": "lab", "m": "org", "cost": 54754, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P145", "n": "Orgánico Fotocromático", "g": "Ocupacional digital", "c": "ocu", "p": "lab", "m": "org", "cost": 78900, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P146", "n": "Orgánico Fotocromático Blue", "g": "Ocupacional digital", "c": "ocu", "p": "lab", "m": "org", "cost": 100444, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P147", "n": "Orgánico Blue Cut", "g": "Ocupacional digital", "c": "ocu", "p": "lab", "m": "org", "cost": 73248, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P148", "n": "Policarbonato Blanco", "g": "Ocupacional digital", "c": "ocu", "p": "lab", "m": "poli", "cost": 61092, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P149", "n": "Orgánico Blanco", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "org", "cost": 82041, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P150", "n": "Orgánico Fotocromático", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "org", "cost": 123823, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P151", "n": "Orgánico Fotocromático Blue", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "org", "cost": 142750, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P152", "n": "Orgánico Blue Cut", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "org", "cost": 99500, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P153", "n": "Orgánico Transitions GEN 8", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "org", "cost": 393278, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P154", "n": "Orgánico 1,67", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "hi", "cost": 171678, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P155", "n": "Policarbonato Blanco", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "poli", "cost": 135031, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P156", "n": "Policarbonato Transitions GEN 8", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "poli", "cost": 413620, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P157", "n": "Policarbonato polarizado Espejado", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "poli", "cost": 246493, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P158", "n": "Policarbonato Fotocromático", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "poli", "cost": 188748, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P159", "n": "Policarbonato Blue", "g": "Multifocal digital", "c": "mul", "p": "lab", "m": "poli", "cost": 144450, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P160", "n": "Orgánico Blanco", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "org", "cost": 116621, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "Mayor campo visual intermedia y cerca, menos aberraciones laterales"}, {"id": "P161", "n": "Orgánico Fotocromático", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "org", "cost": 160970, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P162", "n": "Orgánico Fotocromático Blue", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "org", "cost": 185575, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P163", "n": "Orgánico Blue Cut", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "org", "cost": 141438, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P164", "n": "Orgánico Transitions GEN 8", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "org", "cost": 432606, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P165", "n": "Orgánico 1,67", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "hi", "cost": 223182, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}, {"id": "P166", "n": "Policarbonato Blanco", "g": "Digital Elite", "c": "mul", "p": "lab", "m": "poli", "cost": 162036, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": ""}, {"id": "P167", "n": "Orgánico Blanco", "g": "Digital Classic", "c": "mul", "p": "lab", "m": "org", "cost": 92020, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "NUEVO"}, {"id": "P168", "n": "Orgánico Fotocromático (Gris-Sepia)", "g": "Digital Classic", "c": "mul", "p": "lab", "m": "org", "cost": 132680, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "NUEVO"}, {"id": "P169", "n": "Orgánico Policarbonato", "g": "Digital Classic", "c": "mul", "p": "lab", "m": "poli", "cost": 98440, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "poli", "o": "NUEVO"}, {"id": "P170", "n": "Orgánico Blanco", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "org", "cost": 79303, "tags": [], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P171", "n": "Orgánico Blue", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "org", "cost": 103104, "tags": ["blue", "arq"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P172", "n": "Orgánico H. Índex 1.74", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "hi", "cost": 327898, "tags": [], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P173", "n": "Orgánico Transitions", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "org", "cost": 313483, "tags": ["foto"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P174", "n": "Orgánico Stylis Blue", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "hi", "cost": 208216, "tags": ["blue", "arq"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P175", "n": "Orgánico 1.67", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "hi", "cost": 174106, "tags": [], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P176", "n": "Orgánico 1.67 Transitions", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "hi", "cost": 515133, "tags": ["foto"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P177", "n": "Policarbonato Blanco", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "poli", "cost": 87580, "tags": [], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P178", "n": "Policarbonato Blue", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "poli", "cost": 108100, "tags": ["blue", "arq"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P179", "n": "Policarbonato Transitions", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "poli", "cost": 359729, "tags": ["foto"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P180", "n": "Policarbonato Fotocromático", "g": "Lenticular digital", "c": "mono", "p": "lab", "m": "poli", "cost": 221069, "tags": ["foto"], "rg": {"t": "lent"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P181", "n": "Orgánico Blanco", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 48838, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P182", "n": "Orgánico Blue", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 73214, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P183", "n": "Orgánico Fotocromático", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 122076, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P184", "n": "Orgánico Fotocromático Blue", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 135054, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": "NUEVO"}, {"id": "P185", "n": "Transitions GEN 8", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 211371, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P186", "n": "Transitions Xtractive", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 211371, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P187", "n": "Orgánico Hi. Índex 1.74", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "hi", "cost": 220796, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P188", "n": "Orgánico Polarizado", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "org", "cost": 109249, "tags": ["polar"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P189", "n": "Orgánico 1.67 blanco", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "hi", "cost": 116162, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P190", "n": "Orgánico 1.67 Blue", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "hi", "cost": 136229, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P191", "n": "Orgánico 1.67 Transitions GEN 8", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "hi", "cost": 385097, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "org", "o": ""}, {"id": "P192", "n": "Policarbonato Blanco", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "poli", "cost": 60493, "tags": [], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P193", "n": "Policarbonato Blue", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "poli", "cost": 77607, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P194", "n": "Policarbonato Transitions GEN 8", "g": "Asférico 360", "c": "mono", "p": "lab", "m": "poli", "cost": 242279, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mono_lab", "cm": "poli", "o": ""}, {"id": "P195", "n": "Orgánico Blanco", "g": "Swing Bio", "c": "bif", "p": "lab", "m": "org", "cost": 52949, "tags": [], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": "Con laca en ambas caras. Producción en Rosario 9 días hábiles. Laca no tintable (avisar si lleva coloración)"}, {"id": "P196", "n": "Orgánico Blue", "g": "Swing Bio", "c": "bif", "p": "lab", "m": "org", "cost": 93446, "tags": ["blue", "arq"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P197", "n": "Orgánico Fotocromático", "g": "Swing Bio", "c": "bif", "p": "lab", "m": "org", "cost": 182013, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P198", "n": "Orgánico Fotocromático Blue", "g": "Swing Bio", "c": "bif", "p": "lab", "m": "org", "cost": 193072, "tags": ["foto", "blue", "arq"], "rg": {"t": "lab"}, "cal": "bif", "cm": "org", "o": ""}, {"id": "P199", "n": "Orgánico Blanco", "g": "Swing Basic", "c": "mul", "p": "lab", "m": "org", "cost": 111091, "tags": [], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": "Con laca en ambas caras. Producción en Rosario 9 días hábiles. Laca no tintable"}, {"id": "P200", "n": "Orgánico Fotocromático", "g": "Swing Basic", "c": "mul", "p": "lab", "m": "org", "cost": 263202, "tags": ["foto"], "rg": {"t": "lab"}, "cal": "mul", "cm": "org", "o": ""}], "extras": [{"id": "P201", "n": "Uniforme", "cost": 5246}, {"id": "P202", "n": "Degradé / Según muestra", "cost": 8717}, {"id": "P203", "n": "Color Filtro Blue-Uvx", "cost": 8798}, {"id": "P206", "n": "Tratamiento AR común", "cost": 19500}, {"id": "P207", "n": "AR Premium Blue (No filtra rayos azules)", "cost": 28955}, {"id": "P208", "n": "Trio", "cost": 57357}, {"id": "P209", "n": "Crizal Forte", "cost": 90585}, {"id": "P210", "n": "Crizal Prevencia", "cost": 95601}, {"id": "P211", "n": "Crizal Sapphire", "cost": 93314}, {"id": "P212", "n": "Uvx", "cost": 9270}, {"id": "P214", "n": "Filtros Especiales 460/511/550/570 NaN.", "cost": 34623}, {"id": "P215", "n": "Endurecido Mineral", "cost": 33306}, {"id": "P216", "n": "Tratamiento AR sobre Mineral", "cost": 26921}, {"id": "P217", "n": "Tratamiento Laqueado", "cost": 10170}], "cal": {"mono_stock": {"org": [2563, 4135, 7611], "poli": [3463, 4704, 8566], "min": [3007, null, null]}, "mono_lab": {"org": [3611, 4962, 7611], "poli": [4215, 5219, 8989], "min": [3907, null, null]}, "bif": {"org": [4055, 5464, 10143], "poli": [4659, 5748, 10219], "min": [4363, null, null]}, "mul": {"org": [6493, 8346, 12485], "poli": [8211, 10522, 13377], "min": [null, null, null]}}};
+const $=id=>document.getElementById(id);
+const fmt=n=>"$"+Math.round(n).toLocaleString("es-AR");
+const num=s=>{ if(s==null) return null; s=String(s).trim().replace(",","."); if(s===""||s==="-"||s==="+") return null; const v=parseFloat(s); return isNaN(v)?null:v; };
+const dio=v=>(v>0?"+":"")+v.toFixed(2).replace(".",",");
+const roundTo=(n,s)=>Math.round(n/s)*s;
+const TIPO_LABEL={mono:"Monofocal",bif:"Bifocal",mul:"Multifocal",ocu:"Ocupacional"};
+const MAT_LABEL={org:"Orgánico",hi:"Alto índice",poli:"Policarbonato",min:"Mineral"};
+
+// extras
+(function(){
+  const box=$("extras");
+  DATA.extras.forEach(e=>{
+    const l=document.createElement("label"); l.className="chk";
+    l.innerHTML='<input type="checkbox" data-id="'+e.id+'"> <span>'+e.n+'</span>';
+    box.appendChild(l);
+  });
+})();
+
+// persist settings
+function save(){ try{ localStorage.setItem("cc_cfg",JSON.stringify({mL:$("mL").value,mS:$("mS").value,iva:$("iva").value})); }catch(e){} }
+function load(){ try{ const c=JSON.parse(localStorage.getItem("cc_cfg")||"null"); if(c){ $("mL").value=c.mL; $("mS").value=c.mS; $("iva").value=c.iva; } }catch(e){} }
+load();
+
+function getEyes(){
+  const eyes=[]; let notes=[]; let any=false;
+  [["OD","odE","odC"],["OI","oiE","oiC"]].forEach(([nm,ie,ic])=>{
+    let e=num($(ie).value), c=num($(ic).value);
+    if(e!==null||c!==null) any=true;
+    e=e||0; c=c||0;
+    if(c>0){ e=e+c; c=-c; notes.push(nm+": cilindro positivo pasado a negativo ("+dio(e)+" "+dio(c)+")."); }
+    eyes.push({nm,e,c});
+  });
+  return {eyes,notes,any};
+}
+
+function evalRange(it,eyes){
+  const rg=it.rg;
+  const E=Math.max(...eyes.map(x=>Math.abs(x.e))), C=Math.max(...eyes.map(x=>Math.abs(x.c)));
+  const inStd=(x,e,c)=>Math.abs(x.e)<=e+1e-9 && Math.abs(x.c)<=c+1e-9;
+  switch(rg.t){
+    case "std": return eyes.every(x=>inStd(x,rg.e,rg.c))?{s:"ok"}:{s:"no"};
+    case "ext": return eyes.every(x=>inStd(x,rg.e,rg.c))?{s:"no"}:{s:"conf",n:"Rango extendido: confirmá con el laboratorio que cubra esta receta."};
+    case "min": return eyes.every(x=>inStd(x,rg.e,rg.c))?{s:"ok"}:{s:"no"};
+    case "kod": {
+      let ext=false;
+      const okEye=x=>{
+        const e=x.e,c=Math.abs(x.c),ae=Math.abs(e);
+        if(ae<=4&&c<=2) return true;
+        let z=false;
+        if(ae<=4&&c>=2.25&&c<=4) z=true;
+        else if(((e>=4.25&&e<=6)||(e<=-4.25&&e>=-8))&&c<=4) z=true;
+        else if(e<=-8.25&&e>=-10&&c<=2) z=true;
+        if(z) ext=true; return z;
+      };
+      return eyes.every(okEye)?{s:"ok",n:ext?"Usa el rango extendido de Kodak Blue (mismo precio).":""}:{s:"no"};
+    }
+    case "lent": return E>=8?{s:"ok"}:{s:"no"};
+    case "lab": return (C>4||E>10)?{s:"conf",n:"Graduación alta: confirmá los límites con el laboratorio."}:{s:"ok"};
+    default: return {s:"conf",n:"La lista no indica el rango de este cristal: confirmá con el laboratorio."};
+  }
+}
+
+function render(){
+  save();
+  const {eyes,notes,any}=getEyes();
+  const tipo=document.querySelector('input[name=tipo]:checked').value;
+  $("addWrap").hidden=!(tipo==="bif"||tipo==="mul"||tipo==="ocu");
+  $("rxNote").textContent=notes.length?notes.join(" "):"Cilindro en negativo. Si cargás un cilindro positivo, lo paso a negativo solo.";
+  const out=$("out");
+  if(!any){ out.innerHTML='<div class="empty">Cargá la esfera y el cilindro de cada ojo para ver los cristales y precios.</div>'; $("count").textContent=""; return; }
+  const frame=parseInt(document.querySelector('input[name=frame]:checked').value,10);
+  const feats=[...document.querySelectorAll("#feat input:checked")].map(x=>x.value);
+  const mat=$("mat").value;
+  const mL=num($("mL").value)||1, mS=num($("mS").value)||1, iva=(num($("iva").value)||0)/100;
+  const showCost=$("showCost").checked;
+  const exSel=[...document.querySelectorAll("#extras input:checked")].map(x=>DATA.extras.find(e=>e.id===x.dataset.id));
+  const exPub=exSel.reduce((a,e)=>a+roundTo(e.cost*mS,100),0);
+  const exCost=exSel.reduce((a,e)=>a+e.cost,0);
+  const FR=["común","ranurado","perforado"];
+  const list=[];
+  DATA.items.forEach(it=>{
+    if(it.c!==tipo) return;
+    if(it.p==="promo"){ const fr={comun:0,ranurado:1,perforado:2}[it.fr]; if(fr!==frame) return; }
+    const isSol=it.tags.includes("sol");
+    if(isSol && !feats.includes("sol")) return;
+    for(const f of feats){
+      if(f==="ar"){ if(!(it.tags.includes("ar")||it.tags.includes("arq"))) return; }
+      else if(f==="sol"){ if(!isSol) return; }
+      else if(!it.tags.includes(f)) return;
+    }
+    if(mat && it.m!==mat) return;
+    const r=evalRange(it,eyes);
+    if(r.s==="no") return;
+    const warns=[]; if(r.n) warns.push(r.n);
+    if(it.tags.includes("arq")&&!it.tags.includes("ar")) warns.push("La lista no aclara si incluye antirreflejo: confirmalo.");
+    const lensPub=roundTo(it.cost*mL,100);
+    let calPub=0, calCost=0, calTxt="";
+    if(it.p==="promo"){ calTxt="calibrado "+FR[frame]+" incluido"; }
+    else{
+      const row=DATA.cal[it.cal][it.cm]; const cc=row?row[frame]:null;
+      if(cc==null){ warns.push("El calibrado "+FR[frame]+" para este material no figura en la lista: el total no lo incluye, consultalo."); calTxt="calibrado a consultar"; }
+      else{ calCost=cc; calPub=roundTo(cc*mS,100); calTxt="calibrado "+FR[frame]+" "+fmt(calPub*(1+iva)); }
+    }
+    const sub=lensPub+calPub+exPub;
+    const total=roundTo(sub*(1+iva),1);
+    list.push({it,r,warns,lensPub,calPub,calCost,calTxt,total,cost:it.cost+calCost+exCost});
+  });
+  list.sort((a,b)=>a.total-b.total);
+  const ok=list.filter(x=>x.r.s==="ok"), cf=list.filter(x=>x.r.s==="conf");
+  $("count").textContent=ok.length+" disponibles"+(cf.length?" · "+cf.length+" a confirmar":"");
+  if(!list.length){ out.innerHTML='<div class="empty">No encontré cristales con esos filtros para esta receta. Probá sacar alguna característica o cambiar el material.</div>'; return; }
+  const card=x=>{
+    const it=x.it;
+    const badges='<span class="badge'+(it.p==="promo"?" promo":"")+'">'+(it.p==="promo"?"Promo":(it.p==="stock"?"Stock":"Laboratorio"))+'</span><span class="badge">'+MAT_LABEL[it.m]+'</span>';
+    const idx=list.indexOf(x);
+    let h='<div class="opt"><div><div class="name">'+it.n+'</div><div class="meta">'+badges+it.g+'</div>';
+    h+='<div class="meta">Cristales '+fmt(x.lensPub*(1+iva))+' · '+x.calTxt+(exSel.length?' · agregados '+fmt(exPub*(1+iva)):'')+'</div>';
+    if(showCost) h+='<div class="internal">Costo laboratorio sin IVA: '+fmt(x.cost)+'</div>';
+    h+='</div><div class="price"><div class="big">'+fmt(x.total)+'</div><div class="small">el par, IVA incl.</div></div>';
+    x.warns.forEach(w=>{ h+='<div class="warn">'+w+'</div>'; });
+    h+='<div class="actions"><button type="button" data-copy="'+idx+'">Copiar para WhatsApp</button></div></div>';
+    return h;
+  };
+  let html="";
+  if(ok.length){ html+=ok.map(card).join(""); }
+  if(cf.length){ html+='<div class="sec-title">A confirmar con el laboratorio (la lista no define el rango)</div>'+cf.map(card).join(""); }
+  out.innerHTML=html;
+  out.querySelectorAll("button[data-copy]").forEach(b=>b.addEventListener("click",()=>{
+    const x=list[parseInt(b.dataset.copy,10)];
+    const rx=eyes.map(e=>e.nm+" "+dio(e.e)+" / "+dio(e.c)).join("  |  ");
+    const txt="Presupuesto de cristales\n\nReceta: "+rx+"\nCristales: "+x.it.n+" ("+x.it.g+")\nArmazón: "+FR[frame]+(exSel.length?"\nAgregados: "+exSel.map(e=>e.n).join(", "):"")+"\n\nPrecio del par: "+fmt(x.total)+" (IVA incluido)";
+    copy(txt);
+  }));
+}
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),1800); }
+function copy(t){
+  const fallback=()=>{ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); toast(ok?"Copiado":"No se pudo copiar"); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>toast("Copiado"),fallback); } else fallback();
+}
+document.querySelectorAll("input,select").forEach(el=>{ el.addEventListener("input",render); el.addEventListener("change",render); });
+render();
+</script>
+</body>
+</html>
