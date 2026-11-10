@@ -1,7 +1,10 @@
-// ===== Datos generales de la óptica =====
-// Número con código de país, sin + ni espacios (Argentina celular: 549 + código de área + número)
-var WHATSAPP = "5491100000000";
+// ===== Datos generales de Mirá Distinto =====
+// Número en formato internacional, sin + ni espacios.
+// Argentina: 54 + 9 + código de área + número.
+var WHATSAPP = "5491154611610";
 
-// Logos de redes: poné los archivos en img/ con estos nombres.
-// Si el archivo no existe, se muestra un ícono simple.
-var ICONS = { wsp: "img/logo-wsp.png", ig: "img/logo-ig.png" };
+// Logos de redes guardados en img/.
+var ICONS = {
+  wsp: "img/logo-wsp.png",
+  ig: "img/logo-ig.png"
+};
