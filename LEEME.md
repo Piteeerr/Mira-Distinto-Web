@@ -1,16 +1,34 @@
-# Mira distinto - sitio web
+# Mirá Distinto - sitio web
+
+Sitio institucional de la óptica. La web está pensada para presentar la propuesta, mostrar una selección de productos y facilitar el contacto; no funciona como tienda online.
 
 ## Estructura
-- index.html, catalogo.html, servicios.html, nosotros.html, contacto.html -> una página por sección
-- css/estilos.css  -> todos los estilos (colores y tipografías en :root, arriba de todo)
-- js/config.js     -> número de WhatsApp y logos de redes
-- js/productos.js  -> lista de productos (el único archivo que se toca para cargar catálogo)
-- js/app.js        -> lógica (filtros, WhatsApp, formulario). No hace falta tocarlo.
-- img/             -> logos y fotos (ver img/LEEME.txt)
+- `index.html`: portada y selección de destacados.
+- `catalogo.html`: catálogo de productos con filtros por categoría.
+- `servicios.html`: resumen de la propuesta de la óptica.
+- `nosotros.html`: presentación de Mirá Distinto.
+- `contacto.html`: canales de contacto.
+- `css/estilos.css`: identidad visual y diseño responsive.
+- `js/config.js`: teléfono de WhatsApp y rutas de íconos.
+- `js/productos.js`: listado de productos y rutas a las fotos.
+- `js/app.js`: tarjetas, filtros y enlaces de WhatsApp.
+- `img/`: logo, íconos y fotografías.
 
-## Cosas para completar
-1. Número de WhatsApp en js/config.js
-2. Logos en img/
-3. Productos y fotos en js/productos.js
-4. Textos de nosotros.html, servicios.html y contacto.html (dirección, horarios, mapa)
-5. Si cambian el menú, hay que actualizarlo en las 5 páginas HTML (encabezado y pie se repiten).
+## Cómo agregar un producto
+Editá el arreglo `PRODUCTS` en `js/productos.js`. Cada elemento puede incluir:
+- `nombre`: nombre descriptivo del producto.
+- `categoria`: categoría que se utiliza para generar los filtros.
+- `descripcion`: breve descripción visible en el catálogo.
+- `foto`: ruta relativa a la imagen, por ejemplo `img/productos/nombre-del-archivo.jpg`.
+- `destacado: true`: muestra el producto también en la portada.
+
+No se muestran precios ni marcas por defecto. Agregalos únicamente cuando estén confirmados y la web realmente los necesite.
+
+## Datos que deben mantenerse actualizados
+- Número de WhatsApp en `js/config.js`.
+- Usuario de Instagram y enlace en `contacto.html`.
+- Dirección y horarios: incorporarlos en `contacto.html` cuando estén confirmados.
+- Textos de servicios: publicar únicamente prestaciones que la óptica efectivamente ofrezca.
+
+## Imágenes
+Guardá las fotografías de productos en `img/productos/` y usá sus nombres exactos en `js/productos.js`. Para mejorar la velocidad de carga, conviene comprimir las imágenes grandes y priorizar JPG o WebP cuando sea posible.
