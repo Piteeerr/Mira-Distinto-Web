@@ -27,7 +27,7 @@
       '<img src="' + esc(producto.foto) + '" alt="' + esc(producto.nombre) + '" loading="lazy" decoding="async">' +
       '</a>' +
       '<div class="product-info">' +
-      '<span class="product-category">' + esc(producto.categoria) + '</span>' +
+      '<span class="product-category">' + esc(producto.tipo) + '</span>' +
       '<h3>' + esc(producto.nombre) + '</h3>' +
       '<p>' + esc(producto.descripcion) + '</p>' +
       '<a class="product-link" href="' + wa(mensaje) + '" target="_blank" rel="noopener">Consultar por este modelo <span aria-hidden="true">↗</span></a>' +
@@ -35,43 +35,13 @@
       '</article>';
   }
 
-  // --- Catálogo y filtros ---
+  // --- Galería única de modelos ---
   var grid = document.getElementById("grid");
-  var filtros = document.getElementById("filters");
-
-  if (grid && filtros) {
-    var categorias = ["Todos"].concat(PRODUCTS.map(function (producto) {
-      return producto.categoria;
-    }).filter(function (categoria, indice, lista) {
-      return lista.indexOf(categoria) === indice;
-    }));
-
-    var categoriaActual = "Todos";
-
-    function dibujarCatalogo() {
-      filtros.innerHTML = "";
-
-      categorias.forEach(function (categoria) {
-        var boton = document.createElement("button");
-        boton.type = "button";
-        boton.textContent = categoria;
-        boton.setAttribute("aria-pressed", categoria === categoriaActual ? "true" : "false");
-        boton.addEventListener("click", function () {
-          categoriaActual = categoria;
-          dibujarCatalogo();
-        });
-        filtros.appendChild(boton);
-      });
-
-      grid.innerHTML = PRODUCTS.filter(function (producto) {
-        return categoriaActual === "Todos" || producto.categoria === categoriaActual;
-      }).map(tarjeta).join("");
-    }
-
-    dibujarCatalogo();
+  if (grid) {
+    grid.innerHTML = PRODUCTS.map(tarjeta).join("");
   }
 
-  // --- Selección de destacados en la portada ---
+  // --- Modelos destacados en la portada ---
   var destacados = document.getElementById("featured");
   if (destacados) {
     destacados.innerHTML = PRODUCTS.filter(function (producto) {
